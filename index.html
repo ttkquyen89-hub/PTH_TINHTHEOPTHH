@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BÀI 5. TÍNH THEO PHƯƠNG TRÌNH HÓA HỌC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f0fdf4; }
+        .blank-select {
+            appearance: none;
+            background-color: #f3f4f6;
+            border: 2px dashed #3b82f6;
+            border-radius: 0.375rem;
+            padding: 0.1rem 0.5rem;
+            color: #1d4ed8;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .blank-select:hover { background-color: #dbeafe; }
+        .blank-select:focus { border-style: solid; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+        .correct { border-color: #10b981 !important; border-style: solid !important; background-color: #d1fae5 !important; color: #047857 !important; }
+        .incorrect { border-color: #ef4444 !important; border-style: solid !important; background-color: #fee2e2 !important; color: #b91c1c !important; }
+        
+        /* Custom styles for equation coefficients and inputs */
+        .coef-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: transparent;
+            border: none;
+            color: #d97706; /* Màu cam nổi bật nhẹ để học sinh biết có thể nhấn vào */
+            font-weight: bold;
+            font-size: 1.1em;
+            cursor: pointer;
+            outline: none;
+            padding: 0 0.4rem;
+            text-align: center;
+            min-width: 1.8rem;
+            display: inline-block;
+            border-radius: 4px;
+        }
+        .coef-select:hover { color: #2563eb; background-color: #fef3c7; }
+        .coef-select.correct { color: #10b981 !important; text-decoration: none; }
+        .coef-select.incorrect { color: #ef4444 !important; text-decoration: underline wavy; }
+
+        /* Ép buộc ô chọn hệ số và công thức hóa học luôn nằm trên cùng 1 dòng, căn giữa chiều dọc */
+        .table-auto.border-separate td {
+            white-space: nowrap !important;
+            vertical-align: middle !important;
+        }
+
+        .blank-input {
+            width: 3rem;
+            text-align: center;
+            border: none;
+            border-bottom: 2px dashed #9ca3af;
+            background-color: transparent;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        .blank-input:focus { border-bottom-color: #3b82f6; border-bottom-style: solid; }
+        .blank-input.correct { border-color: #10b981 !important; color: #047857 !important; background-color: #d1fae5 !important; border-radius: 4px; border-style: solid; border-width: 2px; }
+        .blank-input.incorrect { border-color: #ef4444 !important; color: #b91c1c !important; background-color: #fee2e2 !important; border-radius: 4px; border-style: solid; border-width: 2px; }
+
+        /* Modal styling */
+        #result-modal { display: none; }
+        #result-modal.active { display: flex; }
+    </style>
+</head>
+<body class="text-gray-800 pb-20">
+
+<div class="max-w-5xl mx-auto mt-8 bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-green-100">
+    
+    <div class="text-center mb-10 border-b-4 border-green-500 pb-4">
+        <h1 class="text-3xl md:text-4xl font-bold text-green-700 mb-2">BÀI 5. TÍNH THEO PHƯƠNG TRÌNH HÓA HỌC</h1>
+        <p class="text-gray-500 italic">Phiếu học tập tương tác - Điền khuyết</p>
+    </div>
+
+    <!-- NỘI DUNG KIỂM TRA BÀI -->
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold text-white bg-green-600 inline-block px-6 py-2 rounded-t-lg mb-4 uppercase">* Nội dung kiểm tra bài *</h2>
+        <div class="bg-green-50 p-6 rounded-lg rounded-tl-none border border-green-200 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Cột trái -->
+            <div>
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Câu 1: Cho biết tên các ký hiệu sau:</p>
+                    <ul class="space-y-2 ml-4">
+                        <li>n: <select class="blank-select" data-correct="somol"><option value="">...</option><option value="khoiluong">Khối lượng</option><option value="somol">Số mol</option><option value="thetich">Thể tích</option></select></li>
+                        <li>m: <select class="blank-select" data-correct="khoiluong"><option value="">...</option><option value="khoiluong">Khối lượng</option><option value="khoiluongmol">Khối lượng mol</option><option value="somol">Số mol</option></select></li>
+                        <li>M: <select class="blank-select" data-correct="khoiluongmol"><option value="">...</option><option value="khoiluongmol">Khối lượng mol</option><option value="khoiluong">Khối lượng</option><option value="nongdo">Nồng độ mol</option></select></li>
+                        <li>V: <select class="blank-select" data-correct="thetich"><option value="">...</option><option value="áp suất">Áp suất</option><option value="thetich">Thể tích</option><option value="nhietdo">Nhiệt độ</option></select></li>
+                    </ul>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Câu 2: Điều kiện chuẩn (đkc) có:</p>
+                    <p class="ml-4">Nhiệt độ: <select class="blank-select" data-correct="25C"><option value="">...</option><option value="0C">0 °C</option><option value="25C">25 °C</option></select>, 
+                       áp suất: <select class="blank-select" data-correct="1bar"><option value="">...</option><option value="1atm">1 atm</option><option value="1bar">1 bar</option></select></p>
+                </div>
+
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Câu 3: Viết công thức tính các đại lượng sau:</p>
+                    <ul class="space-y-2 ml-4">
+                        <li>n = <select class="blank-select" data-correct="m/M"><option value="">...</option><option value="m/M">m / M</option><option value="M/m">M / m</option><option value="m*M">m × M</option></select></li>
+                        <li>Số mol chất khí ở đkc: n = <select class="blank-select" data-correct="V/24.79"><option value="">...</option><option value="V/22.4">V / 22,4</option><option value="V/24.79">V / 24,79</option></select></li>
+                        <li>m = <select class="blank-select" data-correct="n*M"><option value="">...</option><option value="n*M">n × M</option><option value="n/M">n / M</option></select></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cột phải -->
+            <div>
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Câu 4: Lập phương trình hóa học:</p>
+                    <div class="ml-4 space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="table-auto text-center border-spacing-y-2 border-separate">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                        <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> NaOH</td>
+                                        <td class="px-1">+</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> H<sub>2</sub>SO<sub>4</sub></td>
+                                        <td class="px-2">&rarr;</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> Na<sub>2</sub>SO<sub>4</sub></td>
+                                        <td class="px-1">+</td>
+                                        <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> H<sub>2</sub>O</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                        <td></td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                        <td></td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                        <td></td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table-auto text-center border-spacing-y-2 border-separate">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                        <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> Ca</td>
+                                        <td class="px-1">+</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> O<sub>2</sub></td>
+                                        <td class="px-2">&rarr;</td>
+                                        <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> CaO</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                        <td></td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                        <td></td>
+                                        <td><input type="text" class="blank-input" placeholder="..."></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Câu 5 (Câu 3 cũ): Tính số mol trong các trường hợp sau:</p>
+                    <ul class="space-y-3 ml-4">
+                        <li>a. 10 gam Ca (M<sub>Ca</sub> = 40) <br>
+                            ⟶ n = <select class="blank-select" data-correct="0.25"><option value="">...</option><option value="4">4 mol</option><option value="0.25">0,25 mol</option></select>
+                        </li>
+                        <li>b. 2,479 lít khí H<sub>2</sub> ở đkc <br>
+                            ⟶ n = <select class="blank-select" data-correct="0.1"><option value="">...</option><option value="0.1">0,1 mol</option><option value="10">10 mol</option></select>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHẦN I -->
+    <div class="mb-10">
+        <h2 class="text-xl font-bold text-blue-700 border-b-2 border-blue-500 pb-2 mb-4 uppercase">
+            I. XÁC ĐỊNH KHỐI LƯỢNG, SỐ MOL CỦA CHẤT PHẢN ỨNG VÀ SẢN PHẨM TRONG PHẢN ỨNG HÓA HỌC
+        </h2>
+        
+        <!-- Ví dụ 1 -->
+        <div class="bg-blue-50 p-5 rounded-lg border border-blue-200 mb-6 shadow-sm">
+            <p class="font-bold mb-2">Ví dụ 1:</p>
+            <p class="mb-4">Nung nóng để phân hủy hoàn toàn 25 gam CaCO<sub>3</sub> (thành phần chính của đá vôi) thu được vôi sống (CaO), và khí carbon dioxide (CO<sub>2</sub>). Hãy tính khối lượng của vôi sống thu được sau phản ứng.</p>
+            
+            <div class="bg-white p-4 rounded border border-gray-200">
+                <p class="font-semibold mb-2 italic">Bài làm:</p>
+                <div class="space-y-3 ml-4">
+                    <p><strong>Bước 1:</strong> Viết PTHH và xác định tỉ lệ: <br>
+                        <div class="overflow-x-auto mb-2">
+                            <table class="table-auto text-center border-spacing-y-2 border-separate ml-2">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option></select> CaCO<sub>3</sub></td>
+                                        <td class="px-2">&rarr;</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option></select> CaO</td>
+                                        <td class="px-2">+</td>
+                                        <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option></select> CO<sub>2</sub></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="0.5">0,5</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="0.5">0,5</option></select></td>
+                                        <td></td>
+                                        <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="0.5">0,5</option></select></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </p>
+                    <p><strong>Bước 2:</strong> Xác định số mol đề bài đã cho: <br>
+                        n<sub>CaCO3</sub> = <select class="blank-select" data-correct="25/100"><option value="">...</option><option value="25/100">25 / 100</option><option value="100/25">100 / 25</option></select> = <select class="blank-select" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="4">4</option></select> mol.
+                    </p>
+                    <p><strong>Bước 3:</strong> Dựa vào PTHH tìm số mol chất còn lại: <br>
+                        Theo PTHH: n<sub>CaO</sub> = n<sub>CaCO3</sub> = <select class="blank-select" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="0.5">0,5</option></select> mol.
+                    </p>
+                    <p><strong>Bước 4:</strong> Tính khối lượng chất cần tìm: <br>
+                        m<sub>CaO</sub> = n × M = 0,25 × <select class="blank-select" data-correct="56"><option value="">...</option><option value="40">40</option><option value="56">56</option></select> = <select class="blank-select" data-correct="14"><option value="">...</option><option value="14">14</option><option value="28">28</option></select> gam.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ví dụ 2 -->
+        <div class="bg-blue-50 p-5 rounded-lg border border-blue-200 shadow-sm">
+            <p class="font-bold mb-2">Ví dụ 2:</p>
+            <p class="mb-4">Đốt cháy hoàn toàn 6,2 gam phosphorus (P) trong khí oxygen, theo sơ đồ phản ứng: P + O<sub>2</sub> ⟶ P<sub>2</sub>O<sub>5</sub>. Lập PTHH của phản ứng và tính:<br>
+                a. Khối lượng sản phẩm tạo thành sau phản ứng.<br>
+                b. Tính thể tích khí oxygen đkc tham gia phản ứng.
+            </p>
+            
+            <div class="bg-white p-4 rounded border border-gray-200">
+                <p class="font-semibold mb-2 italic">Bài làm:</p>
+                <div class="space-y-3 ml-4">
+                    <div class="overflow-x-auto mb-2">
+                        <table class="table-auto text-center border-spacing-y-2 border-separate">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                    <td><select class="coef-select" data-correct="4" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="4">4</option></select> P</td>
+                                    <td class="px-2">+</td>
+                                    <td><select class="coef-select" data-correct="5" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="3">3</option><option value="5">5</option></select> O<sub>2</sub></td>
+                                    <td class="px-2">&rarr;</td>
+                                    <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> P<sub>2</sub>O<sub>5</sub></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="4"><option value="">...</option><option value="2">2</option><option value="4">4</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="5"><option value="">...</option><option value="3">3</option><option value="5">5</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.2"><option value="">...</option><option value="0.2">0,2</option><option value="0.4">0,4</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.25"><option value="">...</option><option value="0.25">0,25</option><option value="0.5">0,5</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>• Số mol P: n<sub>P</sub> = <select class="blank-select" data-correct="6.2/31"><option value="">...</option><option value="6.2/31">6,2 / 31</option><option value="6.2/15">6,2 / 15</option></select> = 0,2 mol.</p>
+                    <p>a. Theo PTHH: n<sub>P2O5</sub> = <select class="blank-select" data-correct="2/4"><option value="">...</option><option value="2/4">2/4</option><option value="4/2">4/2</option></select> n<sub>P</sub> = 0,1 mol.<br>
+                       ⟶ m<sub>P2O5</sub> = 0,1 × <select class="blank-select" data-correct="142"><option value="">...</option><option value="142">142</option><option value="94">94</option></select> = <select class="blank-select" data-correct="14.2"><option value="">...</option><option value="14.2">14,2</option><option value="7.1">7,1</option></select> gam.
+                    </p>
+                    <p>b. Theo PTHH: n<sub>O2</sub> = <select class="blank-select" data-correct="5/4"><option value="">...</option><option value="5/4">5/4</option><option value="4/5">4/5</option></select> n<sub>P</sub> = 0,25 mol.<br>
+                       ⟶ V<sub>O2</sub> = 0,25 × <select class="blank-select" data-correct="24.79"><option value="">...</option><option value="22.4">22,4</option><option value="24.79">24,79</option></select> = <select class="blank-select" data-correct="6.1975"><option value="">...</option><option value="6.1975">6,1975</option><option value="5.6">5,6</option></select> lít.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHẦN II -->
+    <div class="mb-10">
+        <h2 class="text-xl font-bold text-orange-600 border-b-2 border-orange-500 pb-2 mb-4 uppercase">
+            II. HIỆU SUẤT PHẢN ỨNG
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 1. Chất hết, chất dư -->
+            <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
+                <h3 class="font-bold mb-3 text-orange-800">1. CHẤT HẾT, CHẤT DƯ</h3>
+                <p class="font-semibold italic mb-2">Kiến thức cần nhớ:</p>
+                <ul class="space-y-3 ml-4 mb-4">
+                    <li>- Chất phản ứng hết: <select class="blank-select" data-correct="khongcon"><option value="">...</option><option value="khongcon">Chất không còn sau phản ứng</option><option value="vancon">Chất vẫn còn sau phản ứng</option></select></li>
+                    <li>- Chất phản ứng dư: <select class="blank-select" data-correct="vancon"><option value="">...</option><option value="khongcon">Chất không còn sau phản ứng</option><option value="vancon">Chất vẫn còn sau phản ứng</option></select></li>
+                </ul>
+                <p class="italic text-sm text-gray-600 mb-2">(Trong tính toán hóa học, lượng sản phẩm tạo thành được tính theo <select class="blank-select text-sm" data-correct="chathet"><option value="">...</option><option value="chathet">chất hết</option><option value="chatdu">chất dư</option></select>)</p>
+                
+                <p class="font-bold mt-4 mb-2">Ví dụ: PTHH: H<sub>2</sub> + Cl<sub>2</sub> ⟶ 2HCl</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center border-collapse bg-white text-sm">
+                        <thead>
+                            <tr class="bg-orange-200">
+                                <th class="border p-2">Thí nghiệm</th>
+                                <th class="border p-2" colspan="2">Lượng chất trước PƯ (mol)</th>
+                                <th class="border p-2" colspan="3">Lượng chất sau PƯ (mol)</th>
+                            </tr>
+                            <tr class="bg-orange-100">
+                                <th class="border p-1"></th>
+                                <th class="border p-1">Cl<sub>2</sub></th>
+                                <th class="border p-1">H<sub>2</sub></th>
+                                <th class="border p-1">H<sub>2</sub></th>
+                                <th class="border p-1">HCl</th>
+                                <th class="border p-1">Cl<sub>2</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border p-2">1</td><td class="border p-2">1</td><td class="border p-2">1</td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="0"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="2"><option value="">?</option><option value="1">1</option><option value="2">2</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="0"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2">2</td><td class="border p-2">2</td><td class="border p-2">1</td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="0"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="2"><option value="">?</option><option value="1">1</option><option value="2">2</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="1"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2">3</td><td class="border p-2">1</td><td class="border p-2">2</td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="1"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="2"><option value="">?</option><option value="1">1</option><option value="2">2</option></select></td>
+                                <td class="border p-2"><select class="blank-select w-10" data-correct="0"><option value="">?</option><option value="0">0</option><option value="1">1</option></select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. Hiệu suất -->
+            <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
+                <h3 class="font-bold mb-3 text-orange-800">2. HIỆU SUẤT PHẢN ỨNG</h3>
+                <p class="font-semibold italic mb-2">Kiến thức cần nhớ:</p>
+                
+                <div class="bg-white p-3 rounded border text-center mb-3">
+                    <p class="font-bold text-lg text-red-600">H = <select class="blank-select text-base" data-correct="mtt/mlt"><option value="">...</option><option value="mtt/mlt">(m<sub>tt</sub> / m<sub>lt</sub>) × 100%</option><option value="mlt/mtt">(m<sub>lt</sub> / m<sub>tt</sub>) × 100%</option></select></p>
+                </div>
+                <p class="text-sm text-gray-700 mb-3 ml-2">
+                    - H: hiệu suất phản ứng (%)<br>
+                    - m<sub>tt</sub>: khối lượng thực tế thu được<br>
+                    - m<sub>lt</sub>: khối lượng lý thuyết (tính theo PTHH)
+                </p>
+                
+                <p class="mb-4 text-justify leading-relaxed">
+                    Hiệu suất phản ứng là <select class="blank-select text-sm" data-correct="tiso"><option value="">...</option><option value="hieu">hiệu</option><option value="tiso">tỉ số</option></select> giữa lượng sản phẩm thu được theo <select class="blank-select text-sm" data-correct="thucte"><option value="">...</option><option value="thucte">thực tế</option><option value="lythuyet">lý thuyết</option></select> và lượng sản phẩm thu được theo <select class="blank-select text-sm" data-correct="lythuyet"><option value="">...</option><option value="thucte">thực tế</option><option value="lythuyet">lý thuyết</option></select>.
+                </p>
+
+                <p class="font-bold mb-2">Ví dụ áp dụng:</p>
+                <div class="bg-white p-3 rounded border text-sm space-y-2">
+                    <p>Đốt cháy 12g C trong O<sub>2</sub> thu được 39,6g CO<sub>2</sub>. Tính H%?</p>
+                    <p>• n<sub>C</sub> = 12/12 = 1 mol ⟶ Lượng CO<sub>2</sub> <b>lý thuyết</b>: n = 1 mol ⟶ m<sub>lt</sub> = <select class="blank-select" data-correct="44"><option value="">...</option><option value="44">44</option><option value="22">22</option></select> g.</p>
+                    <p>• Lượng CO<sub>2</sub> <b>thực tế</b> đề cho: m<sub>tt</sub> = 39,6 g.</p>
+                    <p>⟶ H = (39,6 / 44) × 100% = <select class="blank-select" data-correct="90"><option value="">...</option><option value="80">80</option><option value="90">90</option></select> %.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BÀI TẬP ÁP DỤNG -->
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold text-white bg-purple-600 inline-block px-6 py-2 rounded-t-lg mb-4 uppercase">* Bài tập áp dụng *</h2>
+        
+        <div class="space-y-6 bg-purple-50 p-6 rounded-lg rounded-tl-none border border-purple-200">
+            
+            <!-- Câu 1 -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-purple-100">
+                <p class="font-bold mb-2">Câu 1:</p>
+                <p class="mb-3">Đốt cháy hết 0,54 gam Al trong không khí thu được aluminium oxide. Lập PTHH và tính (a) Khối lượng Al<sub>2</sub>O<sub>3</sub> tạo ra. (b) Thể tích khí O<sub>2</sub> tham gia (đkc).</p>
+                <div class="ml-4 space-y-2 text-sm md:text-base">
+                    <div class="overflow-x-auto mb-3">
+                        <table class="table-auto text-center border-spacing-y-2 border-separate">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                    <td><select class="coef-select" data-correct="4" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="4">4</option></select> Al</td>
+                                    <td class="px-2">+</td>
+                                    <td><select class="coef-select" data-correct="3" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> O<sub>2</sub></td>
+                                    <td class="px-2">&rarr;</td>
+                                    <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> Al<sub>2</sub>O<sub>3</sub></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="4"><option value="">...</option><option value="2">2</option><option value="4">4</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="3"><option value="">...</option><option value="2">2</option><option value="3">3</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.02"><option value="">...</option><option value="0.02">0,02</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.015"><option value="">...</option><option value="0.015">0,015</option><option value="0.03">0,03</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.01"><option value="">...</option><option value="0.01">0,01</option><option value="0.02">0,02</option></select></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>• n<sub>Al</sub> = 0,54 / 27 = <select class="blank-select" data-correct="0.02"><option value="">...</option><option value="0.02">0,02</option><option value="0.2">0,2</option></select> mol.</p>
+                    <p>(a) n<sub>Al2O3</sub> = <select class="blank-select" data-correct="0.01"><option value="">...</option><option value="0.01">0,01</option><option value="0.02">0,02</option></select> mol ⟶ m<sub>Al2O3</sub> = 0,01 × 102 = <select class="blank-select" data-correct="1.02"><option value="">...</option><option value="1.02">1,02</option><option value="10.2">10,2</option></select> gam.</p>
+                    <p>(b) n<sub>O2</sub> = <select class="blank-select" data-correct="0.015"><option value="">...</option><option value="0.015">0,015</option><option value="0.03">0,03</option></select> mol ⟶ V<sub>O2</sub> = 0,015 × 24,79 = <select class="blank-select" data-correct="0.37185"><option value="">...</option><option value="0.37185">0,37185</option><option value="0.336">0,336</option></select> lít.</p>
+                </div>
+            </div>
+
+            <!-- Câu 2 -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-purple-100">
+                <p class="font-bold mb-2">Câu 2:</p>
+                <p class="mb-3">Cho 5,6 gam sắt phản ứng vừa đủ với HCl, thu được FeCl<sub>2</sub> và khí H<sub>2</sub>. (a) Viết PTHH. (b) Tính khối lượng FeCl<sub>2</sub>. (c) Tính V khí H<sub>2</sub> đkc.</p>
+                <div class="ml-4 space-y-2 text-sm md:text-base">
+                    <div class="overflow-x-auto mb-3">
+                        <table class="table-auto text-center border-spacing-y-2 border-separate">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                    <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> Fe</td>
+                                    <td class="px-2">+</td>
+                                    <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> HCl</td>
+                                    <td class="px-2">&rarr;</td>
+                                    <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> FeCl<sub>2</sub></td>
+                                    <td class="px-2">+</td>
+                                    <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> H<sub>2</sub></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.2"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>• n<sub>Fe</sub> = 5,6 / 56 = <select class="blank-select" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="1">1</option></select> mol.</p>
+                    <p>(b) n<sub>FeCl2</sub> = 0,1 mol ⟶ m<sub>FeCl2</sub> = 0,1 × <select class="blank-select" data-correct="127"><option value="">...</option><option value="127">127</option><option value="162.5">162,5</option></select> = <select class="blank-select" data-correct="12.7"><option value="">...</option><option value="12.7">12,7</option><option value="16.25">16,25</option></select> gam.</p>
+                    <p>(c) n<sub>H2</sub> = 0,1 mol ⟶ V<sub>H2</sub> = 0,1 × 24,79 = <select class="blank-select" data-correct="2.479"><option value="">...</option><option value="2.479">2,479</option><option value="2.24">2,24</option></select> lít.</p>
+                </div>
+            </div>
+
+            <!-- Câu 3 -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-purple-100">
+                <p class="font-bold mb-2">Câu 3:</p>
+                <p class="mb-3">Đốt cháy m gam Mg trong oxygen dư thu được 8 gam MgO. (a) Viết PTHH. (b) Tính m (khối lượng Mg). (c) Tính V khí O<sub>2</sub> cần dùng (đkc).</p>
+                <div class="ml-4 space-y-2 text-sm md:text-base">
+                    <div class="overflow-x-auto mb-3">
+                        <table class="table-auto text-center border-spacing-y-2 border-separate">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right font-semibold pr-3 text-sm">PTHH:</td>
+                                    <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> Mg</td>
+                                    <td class="px-2">+</td>
+                                    <td><select class="coef-select" data-correct="1" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option></select> O<sub>2</sub></td>
+                                    <td class="px-2">&rarr;</td>
+                                    <td><select class="coef-select" data-correct="2" title="Chọn hệ số"><option value="1">&nbsp;&nbsp;&nbsp;</option><option value="2">2</option><option value="3">3</option></select> MgO</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Tỉ lệ mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="1"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-12" data-correct="2"><option value="">...</option><option value="1">1</option><option value="2">2</option></select></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right text-sm text-gray-500 pr-3">Số mol:</td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.2"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select></td>
+                                    <td></td>
+                                    <td><select class="blank-select px-1 py-0 text-sm w-16" data-correct="0.2"><option value="">...</option><option value="0.2">0,2</option><option value="0.5">0,5</option></select></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>• n<sub>MgO</sub> = 8 / 40 = <select class="blank-select" data-correct="0.2"><option value="">...</option><option value="0.2">0,2</option><option value="0.5">0,5</option></select> mol.</p>
+                    <p>(b) Theo PTHH: n<sub>Mg</sub> = <select class="blank-select" data-correct="0.2"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select> mol ⟶ m<sub>Mg</sub> = 0,2 × 24 = <select class="blank-select" data-correct="4.8"><option value="">...</option><option value="4.8">4,8</option><option value="2.4">2,4</option></select> gam.</p>
+                    <p>(c) n<sub>O2</sub> = <select class="blank-select" data-correct="0.1"><option value="">...</option><option value="0.1">0,1</option><option value="0.2">0,2</option></select> mol ⟶ V<sub>O2</sub> = 0,1 × 24,79 = <select class="blank-select" data-correct="2.479"><option value="">...</option><option value="2.479">2,479</option><option value="4.958">4,958</option></select> lít.</p>
+                </div>
+            </div>
+
+            <!-- Câu 4 -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-purple-100">
+                <p class="font-bold mb-2">Câu 4:</p>
+                <p class="mb-3">Nung 100 gam CaCO<sub>3</sub>, thu được khí CO<sub>2</sub> và 28 gam vôi sống (CaO). Phản ứng đã cho đạt hiệu suất bao nhiêu?</p>
+                <div class="ml-4 space-y-2 text-sm md:text-base">
+                    <p>• n<sub>CaCO3</sub> = 100 / 100 = 1 mol.</p>
+                    <p>• Lượng CaO <b>lý thuyết</b> thu được: n = 1 mol ⟶ m<sub>lt</sub> = 1 × 56 = <select class="blank-select" data-correct="56"><option value="">...</option><option value="56">56</option><option value="44">44</option></select> gam.</p>
+                    <p>• Lượng CaO <b>thực tế</b> thu được: m<sub>tt</sub> = 28 gam.</p>
+                    <p>⟶ H = (28 / 56) × 100% = <select class="blank-select" data-correct="50"><option value="">...</option><option value="50">50</option><option value="100">100</option></select> %.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Nút kiểm tra -->
+    <div class="text-center mt-12 mb-8">
+        <button id="check-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-full shadow-lg text-lg transition transform hover:scale-105">
+            Kiểm Tra Đáp Án
+        </button>
+    </div>
+
+</div>
+
+<!-- Modal Kết Quả -->
+<div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-100 transition-transform">
+        <div id="modal-icon" class="text-6xl mb-4">🏆</div>
+        <h3 id="modal-title" class="text-2xl font-bold mb-2">Kết quả!</h3>
+        <p id="modal-score" class="text-xl text-gray-700 mb-6">Bạn làm đúng <span class="font-bold text-blue-600">0</span> / 0 câu.</p>
+        <button id="close-modal-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-6 rounded-lg w-full transition">
+            Đóng
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkBtn = document.getElementById('check-btn');
+        const inputs = document.querySelectorAll('.blank-select, .coef-select, .blank-input');
+        const modal = document.getElementById('result-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalScore = document.getElementById('modal-score');
+        const modalTitle = document.getElementById('modal-title');
+        const modalIcon = document.getElementById('modal-icon');
+
+        checkBtn.addEventListener('click', () => {
+            let correctCount = 0;
+            let totalCount = 0;
+            let filledCount = 0;
+
+            inputs.forEach(input => {
+                if (!input.dataset.correct) return; // Chỉ chấm những ô có đáp án
+
+                totalCount++;
+                const isCorrect = input.value.trim() === input.dataset.correct;
+                
+                // Xóa style cũ
+                input.classList.remove('correct', 'incorrect');
+                
+                if (input.value.trim() !== "") {
+                    filledCount++;
+                    if (isCorrect) {
+                        input.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        input.classList.add('incorrect');
+                    }
+                }
+            });
+
+            // Nếu chưa điền hết
+            if(filledCount < totalCount && filledCount > 0) {
+                // Có thể cảnh báo nhẹ nhưng không dùng alert()
+            }
+
+            // Hiển thị modal
+            modalScore.innerHTML = `Bạn làm đúng <span class="font-bold text-blue-600">${correctCount}</span> / ${totalCount} ô trống.`;
+            
+            const percent = (correctCount / totalCount) * 100;
+            if (percent === 100) {
+                modalIcon.textContent = "🌟";
+                modalTitle.textContent = "Xuất sắc!";
+                modalTitle.className = "text-2xl font-bold mb-2 text-green-600";
+            } else if (percent >= 70) {
+                modalIcon.textContent = "👏";
+                modalTitle.textContent = "Làm tốt lắm!";
+                modalTitle.className = "text-2xl font-bold mb-2 text-blue-600";
+            } else if (percent >= 40) {
+                modalIcon.textContent = "📚";
+                modalTitle.textContent = "Cố gắng lên nhé!";
+                modalTitle.className = "text-2xl font-bold mb-2 text-orange-500";
+            } else {
+                modalIcon.textContent = "💪";
+                modalTitle.textContent = "Hãy ôn tập lại bài!";
+                modalTitle.className = "text-2xl font-bold mb-2 text-red-500";
+            }
+
+            modal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // Tự xóa định dạng sai khi người dùng chọn/nhập lại
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                input.classList.remove('correct', 'incorrect');
+            });
+            input.addEventListener('input', () => {
+                input.classList.remove('correct', 'incorrect');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
